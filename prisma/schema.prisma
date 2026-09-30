@@ -1,0 +1,70 @@
+// Database schema (PostgreSQL, e.g. a free Neon database via the Vercel Marketplace).
+// DATABASE_URL is the pooled connection; DATABASE_URL_UNPOOLED is used by `prisma db push`.
+// After editing this file run: npx prisma db push
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+/// Singleton row (id = 1): business identity, hero copy, contact channels and social links.
+/// Edited from /admin/settings. Everything "global" lives here so nothing is hardcoded.
+model Settings {
+  id            Int     @id @default(1)
+  businessName  String
+  tagline       String
+  heroTitle     String
+  heroSubtitle  String
+  heroImageUrl  String  @default("")
+  whatsappNumber String @default("") // digits only incl. country code, e.g. 15551234567
+  phoneNumber   String  @default("")
+  email         String  @default("")
+  address       String  @default("")
+  instagramUrl  String  @default("")
+  facebookUrl   String  @default("")
+  twitterUrl    String  @default("")
+  youtubeUrl    String  @default("")
+}
+
+/// Singleton row (id = 1): content of the About page.
+model AboutContent {
+  id       Int    @id @default(1)
+  title    String
+  body     String // paragraphs separated by a blank line
+  imageUrl String @default("")
+}
+
+/// A service / product. `featured` ones are shown as highlights on the Home page.
+model Service {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       String // free text so clients can write "$45", "From $45", "Custom quote"...
+  imageUrl    String   @default("")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+/// A gallery entry. type is "IMAGE" or "VIDEO"; url may be a file URL or a YouTube link.
+model GalleryItem {
+  id        Int      @id @default(autoincrement())
+  type      String   @default("IMAGE")
+  url       String
+  caption   String   @default("")
+  createdAt DateTime @default(now())
+}
+
+/// A submission from the public Contact form.
+model Inquiry {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String   @default("")
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
